@@ -1,3 +1,36 @@
+"""
+nginx_parser.py
+
+Parses NGINX access logs into a clean, structured pandas DataFrame.
+
+This module handles the low-level work of reading raw access log lines and
+extracting the key fields needed for analysis, such as timestamps, request
+paths, status codes, and client IPs. The goal is to turn messy log text into
+reliable, typed data that downstream analysis and AI components can depend on.
+
+The parser is designed to be:
+- Deterministic: the same input always produces the same output
+- Robust: malformed lines are safely skipped
+- Simple: focused on the most commonly useful log fields
+
+Expected input:
+- NGINX access logs in (or similar to) the standard "combined" format
+
+Returned DataFrame columns:
+- timestamp: when the request was received
+- ip: client IP address
+- method: HTTP method (GET, POST, etc.)
+- path: requested URI path
+- status: HTTP response status code
+- bytes_sent: response size in bytes
+- is_4xx / is_5xx: convenience flags for error analysis
+
+This parser intentionally performs no analysis or AI inference. Its sole
+responsibility is to provide clean, structured data for later stages of the
+log analysis pipeline.
+"""
+
+
 import re
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,7 +51,9 @@ LOG_RE = re.compile(
     r'"(?P<request>[^"]*)"\s+(?P<status>\d{3})\s+(?P<bytes>\S+)'
 )
 
-
+# did not use, still works as a clean schema for what one parsed
+# log line should contain
+# DELETE IF NOT USED LATER
 @dataclass(frozen=True)
 class ParsedLine:
     ip: str
@@ -47,7 +82,9 @@ def _parse_request(request: str) -> Tuple[Optional[str], Optional[str]]:
         return None, None
     return parts[0], parts[1]
 
-
+# Inputs:
+# path: file path to the log
+# max_bad_lines: safety valve so you don't skip thousands of lines bc regex is wrong
 def parse_nginx_log(path: str, *, max_bad_lines: int = 200) -> pd.DataFrame:
     """
     Parse an NGINX access log file into a pandas DataFrame.
@@ -63,15 +100,19 @@ def parse_nginx_log(path: str, *, max_bad_lines: int = 200) -> pd.DataFrame:
     Behavior:
       - Skips malformed lines, counts them, and raises if too many.
     """
+    # list of dicts later converted into DataFrame
     rows: List[Dict[str, Any]] = []
     bad_lines = 0
 
+    # reads line by line, strips whitespace, skips blank lines
     with open(path, "r", encoding="utf-8", errors="replace") as f:
         for line_no, line in enumerate(f, start=1):
             line = line.strip()
             if not line:
                 continue
 
+	    # if the line doesn't match the pattern, we count it and skip
+	    # if too many lines are bad, raise error to indicate regex doesn't fit the log
             m = LOG_RE.match(line)
             if not m:
                 bad_lines += 1
@@ -127,7 +168,9 @@ def parse_nginx_log(path: str, *, max_bad_lines: int = 200) -> pd.DataFrame:
     # Sort (critical for time-series)
     df = df.sort_values("timestamp").reset_index(drop=True)
 
-    # Optional: add helpful derived fields
+    # add helpful derived fields, HTTP status codes
+    # 4xx = Client Errors - the request was bad or not allowed
+    # 5xx = Server Errors - The server failed to handle a valid request
     df["is_4xx"] = (df["status"] >= 400) & (df["status"] < 500)
     df["is_5xx"] = (df["status"] >= 500) & (df["status"] < 600)
 
