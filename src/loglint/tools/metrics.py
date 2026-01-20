@@ -182,6 +182,10 @@ def peak_5xx_window_5m(df: pd.DataFrame, top_k_paths: int = 5) -> Optional[Dict[
         vc = failing["path"].value_counts().head(top_k_paths)
         top_paths = [{"value": idx, "count": int(cnt)} for idx, cnt in vc.items()]
 
+    # Baseline traffic context for comparison (computed from full dataset)
+    baseline = traffic_baseline_5m(df)
+    typical_5m = baseline.get("typical_requests_5m", 0)
+
     return {
         "window_start": _iso(peak_start),
         "window_end": _iso(peak_start + pd.Timedelta(minutes=5)),
@@ -190,7 +194,39 @@ def peak_5xx_window_5m(df: pd.DataFrame, top_k_paths: int = 5) -> Optional[Dict[
         "5xx_count": c5,  # should equal peak_5xx
         "5xx_rate": round(_safe_div(c5, total), 6),
         "top_5xx_paths": top_paths,
+        "typical_requests_5m": typical_5m,
+        "traffic_multiplier_vs_typical": round((total / typical_5m), 3) if typical_5m else None,
     }
+
+
+def requests_per_5m(df: pd.DataFrame) -> List[Dict[str, Any]]:
+    """Return request counts per 5-minute window."""
+    window = df["timestamp"].dt.floor("5min")
+    counts = window.value_counts().sort_index()
+    return [{"window_start": idx.isoformat(), "requests": int(val)} for idx, val in counts.items()]
+
+def traffic_baseline_5m(df: pd.DataFrame) -> Dict[str, Any]:
+    """
+    Compute baseline traffic stats across 5-minute windows.
+    Uses median as the 'typical' value (less sensitive to spikes).
+    """
+    window = df["timestamp"].dt.floor("5min")
+    counts = window.value_counts()
+
+    if counts.empty:
+        return {"typical_requests_5m": 0, "mean_requests_5m": 0.0, "p95_requests_5m": 0}
+
+    typical = int(counts.median())
+    mean = float(counts.mean())
+    p95 = int(counts.quantile(0.95))
+
+    return {
+        "typical_requests_5m": typical,
+        "mean_requests_5m": round(mean, 3),
+        "p95_requests_5m": p95,
+        "num_windows_5m": int(len(counts)),
+    }
+
 
 
 def compute_metrics(df: pd.DataFrame) -> Dict[str, Any]:
@@ -215,6 +251,7 @@ def compute_metrics(df: pd.DataFrame) -> Dict[str, Any]:
         "traffic": {
             "requests_per_minute": requests_per_minute(df),
             "top_paths_by_volume": top_paths_by_volume(df, n=10),
+	    "baseline_5m": traffic_baseline_5m(df),
         },
         "errors": {
             "overall": overall_error_stats(df),

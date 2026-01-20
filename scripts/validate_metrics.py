@@ -12,6 +12,13 @@ df, rep = normalize_events(df_raw, assume_tz="UTC")
 
 metrics = compute_metrics(df)
 
+print("baseline_5m:", metrics["traffic"]["baseline_5m"])
+peak = metrics["errors"]["peak_5xx_window_5m"]
+if peak:
+    print("peak_total_requests:", peak.get("total_requests"))
+    print("typical_requests_5m:", peak.get("typical_requests_5m"))
+    print("traffic_multiplier_vs_typical:", peak.get("traffic_multiplier_vs_typical"))
+
 out_path = Path("artifacts")
 out_path.mkdir(exist_ok=True)
 with open(out_path / "metrics.json", "w", encoding="utf-8") as f:
