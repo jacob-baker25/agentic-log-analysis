@@ -17,11 +17,11 @@ All generated reports MUST follow this schema exactly.
 - 5xx count
 - 5xx failure rate
 
-## 3. Impact Overview
+## 3. Impact
 - Which user-facing functionality was affected
 - Relative severity (low / moderate / high) based on failure rate
 
-## 4. Error Hotspots
+## 4. Hotspots
 - Top failing endpoints (from metrics)
 - Relative contribution of each endpoint
 
