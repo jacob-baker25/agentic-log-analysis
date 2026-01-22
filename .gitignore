@@ -10,7 +10,11 @@ __pycache__/
 *:Zone.Identifier
 Zone.Identifier
 
-artifacts/
+*.log
+!examples/sample_nginx.log
+!examples/sample_nginx_with_incident.log
+*:Zone.Identifier
+Zone.Identifier
 
 # Distribution / packaging
 .Python
