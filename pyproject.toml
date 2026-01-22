@@ -5,6 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "loglint"
 version = "0.1.0"
+dependencies = [
+  "numpy",
+  "pandas",
+  "python-dateutil",
+  "pytz",
+  "tzdata",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

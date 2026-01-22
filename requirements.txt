@@ -1,4 +1,4 @@
--e git+https://github.com/jacob-baker25/agentic-log-analysis.git@c987fd4c75886984a82817c75819ed9237c83ba9#egg=loglint
+-e .
 numpy==2.4.1
 pandas==2.3.3
 python-dateutil==2.9.0.post0
