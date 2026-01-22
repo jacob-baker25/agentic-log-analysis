@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Windows download metadata
+*:Zone.Identifier
+Zone.Identifier
+
 artifacts/
 
 # Distribution / packaging
