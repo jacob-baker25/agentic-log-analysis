@@ -30,17 +30,17 @@ Given an NGINX access log, LogLint AI produces:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
 
 Set your LLM API key (example):
 
 ```bash
 export OPENAI_API_KEY="..."
-
+```
 ### 2. Run the Full Pipeline (Recommended)
-```md
 ```bash
 python scripts/validate_all.py
-```md
+```
 This runs the complete system:
 - Log ingestion and normalization validation
 - Metrics computation and incident detection
