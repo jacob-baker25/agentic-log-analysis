@@ -37,9 +37,10 @@ Set your LLM API key (example):
 export OPENAI_API_KEY="..."
 
 ### 2. Run the Full Pipeline (Recommended)
+```md
 ```bash
 python scripts/validate_all.py
-
+```md
 This runs the complete system:
 - Log ingestion and normalization validation
 - Metrics computation and incident detection
