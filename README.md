@@ -83,12 +83,10 @@ docs/report/
 ```
 ### How Grounding Works (Important)
 The LLM never analyzes raw logs directly. It only receives:
-- `artifacts/metrics.json`
-  Computed facts only
--  `docs/report/report_schema.md`
-  Required report structure and section ordering
-- `docs/report/grounding_rules.md`
-  Anti-hallucination and fact-use rules
+- `artifacts/metrics.json`: Computed facts only
+-  `docs/report/report_schema.md`: Required report structure and section ordering
+- `docs/report/grounding_rules.md`: Anti-hallucination and fact-use rules
+  
 If a number, timestamp, or endpoint is not present in `metrics.json`, the report is not allowed to include it.
 
 ### Validation and Stability
