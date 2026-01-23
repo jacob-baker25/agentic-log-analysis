@@ -49,9 +49,10 @@ This runs the complete system:
 - Stability evaluation across repeated generations
 
 ### Example: Detected Incident Window
-Using the included sample dataset:
-`examples/sample_nginx_with_incident.log`
+Using the included sample dataset: `examples/sample_nginx_with_incident.log`
+
 The pipeline detects a localized server error incident:
+
 - Peak window:
 `2015-05-20T12:05:00+00:00 → 2015-05-20T12:10:00+00:00`
 - Peak 5xx rate:
