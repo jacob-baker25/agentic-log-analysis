@@ -60,7 +60,7 @@ The pipeline detects a localized server error incident:
 `/api/login `
 
 ### Project Layout
-
+```
 src/loglint/
 ├── ingest/
 │   Parses and normalizes NGINX logs into structured events.
@@ -79,7 +79,7 @@ docs/report/
 ├── grounding_rules.md
 ├── example_report.md
 └── evaluation_criteria.md
-
+```
 ### How Grounding Works (Important)
 The LLM never analyzes raw logs directly. It only receives:
 - `artifacts/metrics.json`
