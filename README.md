@@ -22,6 +22,14 @@ Given an NGINX access log, LogLint AI produces:
 
 ---
 
+## Project Highlights
+- Deterministic metrics layer (no LLM math)
+- LLM grounded strictly on computed facts
+- Schema enforcement with automated validation
+- Stability evaluation across repeated generations
+
+---
+
 ## Quickstart
 
 ### 1. Set Up Environment
@@ -29,6 +37,10 @@ Given an NGINX access log, LogLint AI produces:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
+pip install -e .
+```
+Alternatively:
+```bash
 pip install -r requirements.txt
 ```
 
@@ -60,7 +72,9 @@ The pipeline detects a localized server error incident:
 - Domain hotspot:
 `/api/login `
 
-### Project Layout
+---
+
+## Project Layout
 ```
 src/loglint/
 ├── ingest/
@@ -81,7 +95,10 @@ docs/report/
 ├── example_report.md
 └── evaluation_criteria.md
 ```
-### How Grounding Works (Important)
+
+---
+
+## How Grounding Works (Important)
 The LLM never analyzes raw logs directly. It only receives:
 - `artifacts/metrics.json`: Computed facts only
 -  `docs/report/report_schema.md`: Required report structure and section ordering
@@ -89,7 +106,7 @@ The LLM never analyzes raw logs directly. It only receives:
   
 If a number, timestamp, or endpoint is not present in `metrics.json`, the report is not allowed to include it.
 
-### Validation and Stability
+## Validation and Stability
 - `scripts/validate_report.py` checks:
   - Required sections exist and are correctly ordered
   - Peak incident window timestamps match exactly
@@ -98,28 +115,31 @@ If a number, timestamp, or endpoint is not present in `metrics.json`, the report
   - Reruns report generation multiple times on identical inputs
   - Reports pass rates for key invariants such as structure and facts
 
-### Data Notes
+## Data Notes
 The sample incident log is produced by injecting a controlled 5xx spike into a normal access log:
 -  `scripts/inject_incident.py`
 - `examples/sample_nginx_with_incident.log`
 
 This provides a fully reproducible scenario for testing and demonstration.
 
-### Future Work (Not Implemented in v1)
+## Future Work (Not Implemented in v1)
 - Support for additional log formats (JSON app logs, auth logs)
 - Richer numeric fact validation
 - Optional API server (FastAPI)
 - Iterative report refinement loop
 
-### Project Highlights
-- Deterministic metrics layer (no LLM math)
-- LLM grounded strictly on computed facts
-- Schema enforcement with automated validation
-- Stability evaluation across repeated generations
+## Data Source and Attribution
+The base NGINX access log used in this project was sourced from a public GitHub repository curated by Dale McDiarmid, under the path:
+  `Common Data Formats/nginx_logs/nginx_logs`
 
+This project modifies the original data by injecting a controlled 5xx incident window using `scripts/inject_incident.py` to create a reproducible outage scenario for testing and evaluation.
 
+Link to repo: https://github.com/elastic/examples/tree/master/Common%20Data%20Formats/nginx_logs
 
+## Why This Project Exists
+Most LLM-based log analysis tools generate free-form summaries that are difficult to trust or validate.
 
+LogLint AI takes a different approach: all numerical analysis is performed by deterministic code first, and the LLM is restricted to explaining those results under strict schema and grounding rules. Automated validation and stability testing then verify that the output remains consistent across repeated runs.
 
 
 
