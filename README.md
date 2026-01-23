@@ -102,6 +102,7 @@ If a number, timestamp, or endpoint is not present in `metrics.json`, the report
 The sample incident log is produced by injecting a controlled 5xx spike into a normal access log:
 -  `scripts/inject_incident.py`
 - `examples/sample_nginx_with_incident.log`
+
 This provides a fully reproducible scenario for testing and demonstration.
 
 ### Future Work (Not Implemented in v1)
